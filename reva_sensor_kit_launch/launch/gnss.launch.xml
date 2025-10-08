@@ -1,14 +1,39 @@
 <launch>
   <arg name="launch_driver" default="true"/>
-  <arg name="gnss_receiver" default="ublox" description="ublox(default) or septentrio"/>
+  <arg name="gnss_receiver" default="yahboom" description="ublox, septentrio, or yahboom(default)"/>
+  <arg name="gnss_serial_port" default="/dev/ttyUSB0" description="Serial port for GNSS"/>
+  <arg name="gnss_baud_rate" default="9600" description="Baud rate for GNSS serial communication"/>
 
   <group>
     <push-ros-namespace namespace="gnss"/>
 
-    <!-- Switch topic name -->
+    <!-- Switch topic name based on GNSS receiver -->
     <let name="navsatfix_topic_name" value="ublox/nav_sat_fix" if="$(eval &quot;'$(var gnss_receiver)'=='ublox'&quot;)"/>
     <let name="navsatfix_topic_name" value="septentrio/nav_sat_fix" if="$(eval &quot;'$(var gnss_receiver)'=='septentrio'&quot;)"/>
+    <let name="navsatfix_topic_name" value="yahboom/fix" if="$(eval &quot;'$(var gnss_receiver)'=='yahboom'&quot;)"/>
     <let name="orientation_topic_name" value="/autoware_orientation"/>
+
+    <!-- Yahboom GPS Driver (ATGM336H-5N NMEA) -->
+    <group if="$(eval &quot;'$(var gnss_receiver)'=='yahboom'&quot;)">
+      <push-ros-namespace namespace="yahboom"/>
+      <node pkg="nmea_navsat_driver" name="nmea_serial_driver" exec="nmea_serial_driver" if="$(var launch_driver)" respawn="true" respawn_delay="1.0">
+        <!-- Serial port configuration -->
+        <param name="port" value="$(var gnss_serial_port)"/>
+        <param name="baud" value="$(var gnss_baud_rate)"/>
+        
+        <!-- Frame ID -->
+        <param name="frame_id" value="gnss_link"/>
+        
+        <!-- Use GNSS time if available -->
+        <param name="use_GNSS_time" value="false"/>
+        <param name="time_ref_source" value="gps"/>
+        
+        <!-- Output topics -->
+        <remap from="fix" to="fix"/>
+        <remap from="vel" to="vel"/>
+        <remap from="time_reference" to="time_reference"/>
+      </node>
+    </group>
 
     <!-- Ublox Driver -->
     <group if="$(eval &quot;'$(var gnss_receiver)'=='ublox'&quot;)">
@@ -32,7 +57,8 @@
       <arg name="output_topic_gnss_pose_cov" value="pose_with_covariance"/>
       <arg name="output_topic_gnss_fixed" value="fixed"/>
 
-      <arg name="use_gnss_ins_orientation" value="true"/>
+      <arg name="use_gnss_ins_orientation" value="false"/>
+      <arg name="gnss_frame" value="gnss_link"/>
     </include>
   </group>
 </launch>

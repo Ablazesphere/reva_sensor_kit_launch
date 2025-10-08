@@ -1,0 +1,19 @@
+/**:
+  ros__parameters:
+    # Vehicle mirror position parameters for cropbox filtering
+    # These values define the area to crop out vehicle mirrors from point cloud
+    # Adjust these values based on your actual vehicle mirror positions
+    # Coordinates are relative to base_link
+    
+    # Longitudinal offset (x-axis, forward/backward)
+    min_longitudinal_offset: -10.0  # meters behind base_link
+    max_longitudinal_offset: 10.0   # meters in front of base_link
+    
+    # Lateral offset (y-axis, left/right)
+    min_lateral_offset: -10.0       # meters to the right
+    max_lateral_offset: 10.0        # meters to the left
+    
+    # Vertical offset (z-axis, up/down)
+    min_height_offset: -10.0        # meters below base_link
+    max_height_offset: 10.0         # meters above base_link
+

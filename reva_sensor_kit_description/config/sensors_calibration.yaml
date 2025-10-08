@@ -1,0 +1,12 @@
+# This file defines the mounting position of sensor_kit_base_link relative to base_link
+# base_link is at the projection of the rear-axle center onto the ground surface
+# Set these to 0 for now - update after physical calibration
+
+base_link:
+  sensor_kit_base_link:
+    x: 0.76
+    y: 0.0
+    z: 1.83
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0

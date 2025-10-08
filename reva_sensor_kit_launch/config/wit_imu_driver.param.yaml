@@ -1,0 +1,14 @@
+/**:
+  ros__parameters:
+    # WitMotion/Yahboom 10-Axis IMU Driver Parameters
+    # Serial communication settings
+    port: "/dev/imu_usb"  # Serial port (use udev symlink or /dev/ttyUSB*)
+    baud_rate: 9600       # Baud rate (4800-921600 supported)
+    
+    # ROS message settings
+    frame_id: "imu_link"  # Frame ID for IMU messages
+    
+    # Driver behavior
+    timeout: 0.5          # Serial timeout in seconds
+    respawn: true         # Restart driver if it crashes
+    respawn_delay: 1.0    # Delay before respawn in seconds

@@ -1,0 +1,73 @@
+<launch>
+  <arg name="launch_driver" default="true"/>
+  <arg name="camera_name" default="camera0"/>
+  
+  <!-- Intel RealSense D435i Camera -->
+  <group>
+    <push-ros-namespace namespace="$(var camera_name)"/>
+    
+    <!-- RealSense Camera Driver -->
+    <group if="$(var launch_driver)">
+      <include file="$(find-pkg-share realsense2_camera)/launch/rs_launch.py">
+        <!-- Camera name and serial number (optional) -->
+        <arg name="camera_name" value="$(var camera_name)"/>
+        <!-- <arg name="serial_no" value="_your_camera_serial_number"/> -->
+        
+        <!-- Enable/Disable different streams -->
+        <arg name="enable_color" value="true"/>
+        <arg name="enable_depth" value="true"/>
+        <arg name="enable_infra1" value="false"/>
+        <arg name="enable_infra2" value="false"/>
+        <arg name="enable_gyro" value="true"/>
+        <arg name="enable_accel" value="true"/>
+        <arg name="enable_sync" value="true"/>
+        
+        <!-- RGB Camera Configuration -->
+        <!-- D435i supports: 1920x1080, 1280x720, 640x480 -->
+        <arg name="rgb_camera.color_profile" value="1920,1080,30"/>
+        <arg name="rgb_camera.enable_auto_exposure" value="true"/>
+        
+        <!-- Depth Camera Configuration -->
+        <!-- D435i depth: 1280x720, 848x480, 640x480 -->
+        <arg name="depth_module.depth_profile" value="1280,720,30"/>
+        <arg name="depth_module.enable_auto_exposure" value="true"/>
+        
+        <!-- Point Cloud -->
+        <arg name="pointcloud.enable" value="true"/>
+        <arg name="align_depth.enable" value="true"/>
+        
+        <!-- Frame IDs -->
+        <arg name="camera_namespace" value="$(var camera_name)"/>
+        <arg name="base_frame_id" value="$(var camera_name)_link"/>
+        <arg name="depth_frame_id" value="$(var camera_name)_depth_frame"/>
+        <arg name="color_frame_id" value="$(var camera_name)_color_frame"/>
+        
+        <!-- Publishing Options -->
+        <arg name="publish_tf" value="false"/>  <!-- We handle TF in URDF -->
+        <arg name="tf_publish_rate" value="0.0"/>
+      </include>
+    </group>
+    
+    <!-- Optional: Traffic Light Detection Pipeline -->
+    <!-- Uncomment when you want to add 2D object detection -->
+    <!--
+    <group>
+      <push-ros-namespace namespace="traffic_light"/>
+      
+      <node pkg="topic_tools" exec="relay" name="tl_camera_info_relay" output="log">
+        <param name="input_topic" value="/$(var camera_name)/color/camera_info"/>
+        <param name="output_topic" value="camera_info"/>
+        <param name="type" value="sensor_msgs/msg/CameraInfo"/>
+        <param name="reliability" value="best_effort"/>
+      </node>
+
+      <node pkg="topic_tools" exec="relay" name="tl_image_relay" output="log">
+        <param name="input_topic" value="/$(var camera_name)/color/image_raw"/>
+        <param name="output_topic" value="image_raw"/>
+        <param name="type" value="sensor_msgs/msg/Image"/>
+        <param name="reliability" value="best_effort"/>
+      </node>
+    </group>
+    -->
+  </group>
+</launch>

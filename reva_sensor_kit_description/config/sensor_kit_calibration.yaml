@@ -1,0 +1,36 @@
+sensor_kit_base_link:
+  # RoboSense Helios 16 with LIO-SAM compatible frame naming
+  velodyne_top_base_link:
+    x: 0.0
+    y: 0.0
+    z: 0.0635
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+  
+  # Intel RealSense D435i
+  camera0/camera_link:
+    x: 0.1482
+    y: 0.0
+    z: -0.1478
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+  
+  # Yahboom IMU 
+  imu_link:
+    x: -0.44
+    y: 0.00892
+    z: -0.880
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
+  
+  # GNSS module 
+  gnss_link:
+    x: 0.11
+    y: 0.0
+    z: -0.04
+    roll: 0.0
+    pitch: 0.0
+    yaw: 0.0
