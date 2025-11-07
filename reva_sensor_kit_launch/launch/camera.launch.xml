@@ -47,27 +47,22 @@
         <arg name="tf_publish_rate" value="0.0"/>
       </include>
     </group>
-    
-    <!-- Optional: Traffic Light Detection Pipeline -->
-    <!-- Uncomment when you want to add 2D object detection -->
-    <!--
-    <group>
-      <push-ros-namespace namespace="traffic_light"/>
-      
-      <node pkg="topic_tools" exec="relay" name="tl_camera_info_relay" output="log">
-        <param name="input_topic" value="/$(var camera_name)/color/camera_info"/>
-        <param name="output_topic" value="camera_info"/>
-        <param name="type" value="sensor_msgs/msg/CameraInfo"/>
-        <param name="reliability" value="best_effort"/>
-      </node>
+  </group>
+  
+  <!-- Traffic Light Recognition Pipeline - Relay to Autoware expected topics -->
+  <group>
+    <!-- Relay camera image for traffic light recognition -->
+    <node pkg="topic_tools" exec="relay" name="traffic_light_image_relay" output="log">
+      <remap from="input" to="/$(var camera_name)/color/image_raw"/>
+      <remap from="output" to="/sensing/camera/traffic_light/image_raw"/>
+      <param name="reliability" value="best_effort"/>
+    </node>
 
-      <node pkg="topic_tools" exec="relay" name="tl_image_relay" output="log">
-        <param name="input_topic" value="/$(var camera_name)/color/image_raw"/>
-        <param name="output_topic" value="image_raw"/>
-        <param name="type" value="sensor_msgs/msg/Image"/>
-        <param name="reliability" value="best_effort"/>
-      </node>
-    </group>
-    -->
+    <!-- Relay camera info for traffic light recognition -->
+    <node pkg="topic_tools" exec="relay" name="traffic_light_camera_info_relay" output="log">
+      <remap from="input" to="/$(var camera_name)/color/camera_info"/>
+      <remap from="output" to="/sensing/camera/traffic_light/camera_info"/>
+      <param name="reliability" value="best_effort"/>
+    </node>
   </group>
 </launch>

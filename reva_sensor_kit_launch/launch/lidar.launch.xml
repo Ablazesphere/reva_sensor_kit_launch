@@ -5,42 +5,32 @@
   <arg name="vehicle_mirror_param_file" default=""/>
   <arg name="use_pointcloud_container" default="true"/>
   <arg name="pointcloud_container_name" default="pointcloud_container"/>
+  <arg name="rslidar_config_file" default="$(find-pkg-share reva_sensor_kit_launch)/config/rslidar_config.yaml" description="Path to rslidar config file"/>
 
-  <!-- RoboSense Helios 16 LiDAR with LIO-SAM compatible frame naming -->
+  <!-- RSLidar Driver -->
   <group>
     <push-ros-namespace namespace="lidar"/>
-    <include file="$(find-pkg-share common_sensor_launch)/launch/robosense_Helios.launch.xml">
-      <!-- Sensor Model -->
-      <arg name="model" value="Helios"/>
+    
+    <group>
+      <push-ros-namespace namespace="top"/>
       
-      <!-- Range Settings -->
-      <arg name="max_range" value="150.0"/>
-      <arg name="min_range" value="0.2"/>
-      
-      <!-- Frame ID - LIO-SAM compatible naming -->
-      <arg name="sensor_frame" value="velodyne_top"/>
-      
-      <!-- Return Mode: SingleStrongest, Dual, etc. -->
-      <arg name="return_mode" value="Dual"/>
-      
-      <!-- Network Configuration -->
-      <!-- IMPORTANT: Check your LiDAR's actual port configuration! -->
-      <!-- RoboSense typically uses 6699 for data, but check your sensor -->
-      <arg name="sensor_ip" value="192.168.1.200"/>
-      <arg name="host_ip" value="192.168.1.100"/>
-      <arg name="data_port" value="6699"/>
-      <arg name="gnss_port" value="7788"/>
-      
-      <!-- Scan Configuration -->
-      <arg name="scan_phase" value="0.0"/>
-      <arg name="cloud_min_angle" value="0"/>
-      <arg name="cloud_max_angle" value="360"/>
-      
-      <!-- Launch Options -->
-      <arg name="launch_driver" value="$(var launch_driver)"/>
-      <arg name="vehicle_mirror_param_file" value="$(var vehicle_mirror_param_file)"/>
-      <arg name="container_name" value="$(var pointcloud_container_name)"/>
-      <arg name="udp_only" value="false"/>
-    </include>
+      <!-- RSLidar SDK Node -->
+      <group if="$(var launch_driver)">
+        <node pkg="rslidar_sdk" exec="rslidar_sdk_node" name="rslidar_sdk_node" output="screen" respawn="true" respawn_delay="1.0">
+          <param name="config_path" value="$(var rslidar_config_file)"/>
+          <!-- Remap rslidar point cloud topic to Autoware expected topic -->
+          <remap from="/rslidar_points" to="pointcloud_raw"/>
+        </node>
+      </group>
+    </group>
+  </group>
+
+  <!-- Relay pointcloud to sensing namespace for Autoware pipeline -->
+  <group>
+    <node pkg="topic_tools" exec="relay" name="lidar_pointcloud_relay" output="log">
+      <remap from="input" to="/lidar/top/pointcloud_raw"/>
+      <remap from="output" to="/sensing/lidar/top/pointcloud_before_sync"/>
+      <param name="reliability" value="best_effort"/>
+    </node>
   </group>
 </launch>
